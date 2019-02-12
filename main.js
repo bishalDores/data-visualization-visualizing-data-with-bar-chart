@@ -23,39 +23,36 @@ function DrawBar(dataset){
     var xAxis = d3.axisBottom(xAxisScale);
     var yAxis = d3.axisLeft(yAxisScale);
 
-    var tooltip = d3.select('body').append('div')
-        .style({
-            'position' : 'absolute',
-            'padding' : '4px',
-            'background' : '#fff',
-            'border': '1px solid #000',
-            'color':'#000'
-        });
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
 
-    function mouseoverHandler(d) {
-        tooltip.transition().style('opacity', .8)
-        tooltip.style({
-            'left' : (d3.event.pageX + 10) + 'px',
-            'top' : (d3.event.pageY + 15) + 'px'
-        })
-            .html('<p> Date: ' + d[0] + '</p>'
-                + '<p> Billions: ' + d[1] + '</p>')
 
-        d3.select(this)
-            .style('opacity', .1);
-    }
+    // function mouseoverHandler(d) {
+    //     tooltip.transition().style('opacity', .8);
+    //     tooltip.style({
+    //         'left' : (d3.event.pageX + 10) + 'px',
+    //         'top' : (d3.event.pageY + 15) + 'px'
+    //     })
+    //          .html('<p> Date: ' + d[0] + '</p>'
+                 // + '<p> Billions: ' + d[1] + '</p>');
+    //
+    //     d3.select(this)
+    //         .style('opacity', .1);
+    // }
 
-    function mouseoutHandler(d) {
-        tooltip.transition().style('opacity', 0)
-        d3.select(this)
-            .style('opacity', 1);
-    }
-
-    function mouseMoving (d) {
-        tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-        d3.select(this)
-            .style('opacity', 0.8);
-    }
+    // function mouseoutHandler(d) {
+    //     tooltip.transition().style('opacity', 0);
+    //     d3.select(this)
+    //         .style('opacity', 1);
+    // }
+    //
+    // function mouseMoving (d) {
+    //     tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+    //     d3.select(this)
+    //         .style('opacity', 0.8);
+    // }
 
     var svg = d3.select("#barGraph").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -66,19 +63,45 @@ function DrawBar(dataset){
 
     // console.log(dataset);
 
-    svg.selectAll("bar").data(dataset).enter().append("rect")
+    svg.selectAll("bar")
+        .data(dataset)
+        .enter()
+        .append("rect")
         .style("fill","steelblue")
+        .attr("class","bar")
+        .attr("data-date", function (d,i) {
+            return d[0];
+        })
+        .attr("data-gdp", function (d,i) {
+            return d[1];
+        })
         .attr("x",(d,i)=> i*(width/dataset.length))
         .attr("y",(d)=>yAxisScale(d[1]))
         .attr("width",width/dataset.length)
         .attr("height",(d)=>height-yAxisScale(d[1]))
-
-        .on('mouseover',mouseoverHandler)
-        .on('mousemove',mouseMoving)
-        .on('mouseout',mouseoutHandler);
+        .on('mouseover',function (d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div .html('<p> Date: ' + d[0] + '</p>'
+                + '<p> Billions: ' + d[1] + '</p>')
+                .style("left", (d3.event.pageX + 10) + "px")
+                .style("top", (d3.event.pageY + 10) + "px");
+        })
+        .on('mousemove',function (d) {
+            div.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+            d3.select(this)
+                .style('opacity', 0.5);
+        })
+        .on('mouseout',function (d) {
+            div.transition().style('opacity', 0);
+            d3.select(this)
+                .style('opacity', 1);
+        });
 
     svg.append("g")
         .attr("class", "x axis")
+        .attr("id","x-axis")
         .attr("transform", "translate(0, " + height + ")")
         .call(xAxis)
         .selectAll("text")
@@ -86,17 +109,25 @@ function DrawBar(dataset){
         .attr("dx", "-0.5em")
         .attr("dy", "-.55em")
         .attr("y", 30)
-        .attr("transform", "rotate(-45)" )
+        .attr("transform", "rotate(-45)" );
 
     svg.append("g")
         .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -85)
-        .attr("dy", "0.8em")
-        .attr("text-anchor", "end")
-        .text("Value (billions)");
+        .attr("id","y-axis")
+        .call(yAxis);
+        // .append("text")
+        // .attr("transform", "rotate(-90)")
+        // .attr("y", -85)
+        // .attr("dy", "0.8em")
+        // .attr("text-anchor", "end")
+        // .text("Value (billions)");
+svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -85)
+    .attr("x",0 - (height / 3))
+    .attr("dy", "1em")
+    .style("text-anchor", "end")
+    .text("Value (billions)");
 }
 
 
