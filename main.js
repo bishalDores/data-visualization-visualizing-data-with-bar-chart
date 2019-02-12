@@ -23,13 +23,39 @@ function DrawBar(dataset){
     var xAxis = d3.axisBottom(xAxisScale);
     var yAxis = d3.axisLeft(yAxisScale);
 
-    var toopltip = d3.select('body').append('div').style({
-        'position':'absolute',
-        'padding':'4px',
-        'background':'#fff',
-        'border':'1px solid #000',
-        'color':'#000'
-    });
+    var tooltip = d3.select('body').append('div')
+        .style({
+            'position' : 'absolute',
+            'padding' : '4px',
+            'background' : '#fff',
+            'border': '1px solid #000',
+            'color':'#000'
+        });
+
+    function mouseoverHandler(d) {
+        tooltip.transition().style('opacity', .8)
+        tooltip.style({
+            'left' : (d3.event.pageX + 10) + 'px',
+            'top' : (d3.event.pageY + 15) + 'px'
+        })
+            .html('<p> Date: ' + d[0] + '</p>'
+                + '<p> Billions: ' + d[1] + '</p>')
+
+        d3.select(this)
+            .style('opacity', .1);
+    }
+
+    function mouseoutHandler(d) {
+        tooltip.transition().style('opacity', 0)
+        d3.select(this)
+            .style('opacity', 1);
+    }
+
+    function mouseMoving (d) {
+        tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+        d3.select(this)
+            .style('opacity', 0.8);
+    }
 
     var svg = d3.select("#barGraph").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -52,15 +78,15 @@ function DrawBar(dataset){
         .on('mouseout',mouseoutHandler);
 
     svg.append("g")
-        .attr("class","x axis")
-        .attr("transform", "translate(0,"+height+")")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, " + height + ")")
         .call(xAxis)
         .selectAll("text")
-        .style("text-anchor","end")
-        .attr("dx","-0.5em")
-        .attr("dy","-.55em")
-        .attr("y",30)
-        .attr("transform","rotate(-45)")
+        .style("text-anchor", "end")
+        .attr("dx", "-0.5em")
+        .attr("dy", "-.55em")
+        .attr("y", 30)
+        .attr("transform", "rotate(-45)" )
 
     svg.append("g")
         .attr("class", "y axis")
