@@ -1,6 +1,6 @@
 ## FreeCodeCamp Project
 ### Data Visualization Projects - Visualize Data with a Bar Chart
-Dataset link: https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json
+Dataset link: https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json <br/>
 **d3 js library v4 is used**
 ###### Sample user stories:
 * My chart should have a title with a corresponding id="title"
